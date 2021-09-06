@@ -1,0 +1,9 @@
+*.test.4tc
+*.aux
+*.log
+*.tmp
+*.xref
+*.4ct
+*.idv
+*.lg
+*.dvi
