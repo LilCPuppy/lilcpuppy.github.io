@@ -1,0 +1,122 @@
+\documentclass[11pt]{article}
+
+\usepackage{amssymb, enumitem, xcolor, titlesec, geometry, sectsty, hyperref}
+\usepackage{amsthm}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{eso-pic}
+
+\theoremstyle{definition}
+\newtheorem{problem}{Problem}
+\newtheorem{definition}{Definition}
+
+\definecolor{SealGray}{HTML}{54585A}
+\definecolor{CalPolyGreen}{HTML}{154734}
+
+\newcommand\mybigskip{\bigskip}
+
+\geometry{legalpaper, margin=15.15in}
+\sectionfont{\fontsize{16}{16}\selectfont}
+
+\color{SealGray}
+
+\setlist[itemize]{itemsep=-1ex,topsep=0.5ex,parsep=1ex}
+\setlength{\parindent}{0ex}
+\setlength{\parskip}{0ex}
+
+\titleformat*{\section}{\selectfont \large \bfseries \color{CalPolyGreen}}
+
+\pagestyle{empty}
+
+
+\begin{document}
+
+~
+~
+
+\begin{center}
+  {
+	\fontsize{1.5cm}{1.5cm}
+        \textcolor{CalPolyGreen}{\textbf{Chapter One}}
+  }
+
+\end{center}
+
+~
+~
+
+
+\section*{\textcolor{CalPolyGreen}{Overview}}
+
+\begin{definition}
+\textit{Reinforcement Learning} defines a process of how to map situations to actions such that a numerical reward signal is maximized.
+\end{definition}
+
+One often thinks of supervised learning when considering ML, and reinforcement learning differs in a distinct way: RL problems are interactive. The environment can change around the agent, and the agent could possibly change the environment.
+
+There are two distinguishing characteristics associated with reinforcement learning problems:
+
+\begin{itemize}
+    \item Trial and error search, and
+    \item Delayed reward
+\end{itemize}
+
+What makes these distinguishing?  The \textit{trial and error} ensure that the agent (or learner) will try new things.  As a result, we mitigate the possibility of the agent finding some local maximum with respect to the reward signal, and will continue to explore the state space.  The \textit{delayed reward} means that the agent must think about the future, and the possible long term effects of the current action.
+
+Another facet of machine learning is the trade-off between exploration and exploitation? Should the agent take advantage of moves/states that it already knows? Or should it consider exploring a new state? This is a dilemma that does not even arise in conventional supervised learning, and has been studied extensively by mathematicians for decades.
+
+Now, RL problems are \textit{goal oriented}.  There is always a very explicit goal in mind in a well-posed RL problem, and Sutton and Barto provide the following examples:
+
+\begin{itemize}
+    \item A master chess player deciding a move to make (goal: win the game)
+    \item An adaptive controller changing paramters of a businesses machines in real-time (goal: optimize output)
+    \item A gazelle struggling to walk after being born, but running 20 minutes later (goal: locomotion)
+    \item A mobile robot deciding to clean a new room or head back to it's charging station to refuel (goal: minimize cleaning time)
+\end{itemize}
+
+\section*{\textcolor{CalPolyGreen}{Elements of RL}}
+
+\begin{definition}
+\textit{The policy} defines how the agent behaves in a given state or time.
+\end{definition}
+
+\begin{definition}
+\textit{The reward function} defines the \textit{goal} of the RL problem to the agent, and maps each state of the environment to a single number/reward. \textit{It cannot be altered by the agent, but it can alter the agent's policy}.
+\end{definition}
+
+\begin{definition}
+\textit{The value function} specifies the \textit{long-term value} of an action/state. The value of the state is the total amount of reward the agent can expect to accumulate over the future, starting from that state.
+\end{definition}
+
+We might consider rewards to be a more \textit{fundamental} than value, because without reward, there is no value. However, in RL algorithms (and the users, us) focus much more on value. In fact, according to Sutton and Barto, the most important component of RL problems is how value is defined and computed. It is a much more difficult factor to derive/compute, because it must be estimated and re-estimated based on the everchanging experience of the agent.
+
+Some problems don't focus on value at all, and instead focus on exploring the \textit{space of policies}. These algorithms are called \textit{evolutionary methods} and can be effective on certain classes of problems.
+
+\section*{\textcolor{CalPolyGreen}{Example: Tic-Tac-Toe}}
+
+Now we discuss how a RL solution might look for an agent who wants to win tic-tac-toe. The goal here is very clear:
+
+\textbf{Goal}: Win the game.
+
+The \textit{policy} would be the rule that tells the agent/player what move to make next in every state of the game.
+
+The first thing we want to do is have a table of scalars bijectively associated associated with every state of the game.  This scalar will represent the probability that we will win the game given that state.  Hence, this is our \textit{value function} to be learned (we will update this function as we play).  To initialize this function any states with three $x$'s in a row will be assigned $1.0$ (since we already won), andy state with three $o$'s in a row is assigned $0.0$ (we already lost), and all other states are assigned $\frac{1}{2}$, a coin-tosses chance.
+
+So how will we update the value function?  It's intuitive that as we play the game against the opponents and accumulate sequences of boards, we want the \textit{values of earlier states to become closer to the values of the later states}.
+
+Let $E$ denote the set of possible states/boards (hence $|E| = 19683$ if we ignore impossible boards).  Then let $V$ represent the value function such that
+\[
+    V\to\mathbb{R}.
+\]
+Then for a sequence of boards representing a single game (in which it was the \textit{agent's turn to player}, namely
+\[
+    \big\{ S_1, \dots, S_N \big\}
+\]
+we udpate the $V$ according to the following rule:
+\[
+    V(S_k) = V(S_k) + \alpha \big[V(S_{k+1}) - V(S_k) \big].
+\]
+
+Colloquially, we move the value fo the board an $\alpha$ amount in the value of the next boards direction.  We call $\alpha$ the \textit{step size}, which can be tuned by the user.  Note that $k < N$, and this recursive definition is well defined, because $k = N$ falls into the aforementioned edge cases.
+
+\end{document}
