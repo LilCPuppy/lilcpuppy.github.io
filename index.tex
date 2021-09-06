@@ -1,0 +1,52 @@
+\documentclass[11pt]{article}
+
+\usepackage{amssymb, enumitem, xcolor, titlesec, geometry, sectsty, hyperref}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{eso-pic}
+
+\definecolor{SealGray}{HTML}{54585A}
+\definecolor{CalPolyGreen}{HTML}{154734}
+
+\newcommand\mybigskip{\bigskip}
+
+\geometry{legalpaper, margin=15.15in}
+\sectionfont{\fontsize{16}{16}\selectfont}
+
+\color{SealGray}
+
+\setlist[itemize]{itemsep=-1ex,topsep=0.5ex,parsep=1ex}
+\setlength{\parindent}{0ex}
+\setlength{\parskip}{0ex}
+
+\titleformat*{\section}{\selectfont \large \bfseries \color{CalPolyGreen}}
+
+\pagestyle{empty}
+
+
+\begin{document}
+
+~
+~
+
+\begin{center}
+  {
+	\fontsize{1.5cm}{1.5cm}
+        \textcolor{CalPolyGreen}{\textbf{Home}}
+  }
+
+\end{center}
+
+~
+~
+
+
+\section*{\textcolor{CalPolyGreen}{Personal}}
+\begin{tabular}{llll}
+        2020    & M.S.  & Mathematics           & Cal Poly, San Luis Obispo, CA \\
+        2020    & B.S.  & Mathematics           & Cal Poly, San Luis Obispo, CA \\
+        2020    & B.S.  & Computer Science      & Cal Poly, San Luis Obispo, CA \\
+\end{tabular}
+
+
+\end{document}

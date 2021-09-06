@@ -1,6 +1,9 @@
 CC = xelatex
 
-all : resume 
+all : resume index
+
+index :
+	make4ht -u -c mycfg.cfg index.tex
 
 resume :
 	make4ht -u -c mycfg.cfg resume.tex
