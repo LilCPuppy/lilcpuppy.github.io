@@ -11,5 +11,8 @@ resume :
 rl_ch1:
 	make4ht -u -c mycfg.cfg reinforcement_learning_chapter_one.tex
 
+rl_ch2:
+	make4ht -u -c mycfg.cfg reinforcement_learning_chapter_two.tex
+
 clean :
-	rm *.log *.aux *.out *.tmp *.xref *.lg *.png *.4tc *4ct *.dvi *.idv
+	rm *.log *.aux *.out *.tmp *.xref *.lg *.4tc *4ct *.dvi *.idv

@@ -1,0 +1,82 @@
+\documentclass[11pt]{article}
+
+\usepackage{amssymb, enumitem, xcolor, titlesec, geometry, sectsty, hyperref}
+\usepackage{amsthm}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{eso-pic}
+
+\theoremstyle{definition}
+\newtheorem{problem}{Problem}
+\newtheorem{definition}{Definition}
+
+\definecolor{SealGray}{HTML}{54585A}
+\definecolor{CalPolyGreen}{HTML}{154734}
+
+\newcommand\mybigskip{\bigskip}
+
+\geometry{legalpaper, margin=15.15in}
+\sectionfont{\fontsize{16}{16}\selectfont}
+
+\color{SealGray}
+
+\setlist[itemize]{itemsep=-1ex,topsep=0.5ex,parsep=1ex}
+\setlength{\parindent}{0ex}
+\setlength{\parskip}{0ex}
+
+\titleformat*{\section}{\selectfont \large \bfseries \color{CalPolyGreen}}
+
+\pagestyle{empty}
+
+
+\begin{document}
+
+~
+~
+
+\begin{center}
+  {
+	\fontsize{1.5cm}{1.5cm}
+        \textcolor{CalPolyGreen}{\textbf{Chapter Two}}
+  }
+
+\end{center}
+
+~
+~
+
+\section*{\textcolor{CalPolyGreen}{Introduction}}
+
+The most important feature about reinforcement learning from other types of the learning is that it uses training data to \textit{evaluate} actions rather than \textit{instructing} the agent on what to do with correct actions. This creates the need for exploration, since "purely evaluative feedback indicates only how good the action is, but not whether it's the best or worst action available". Another key distinction between evaluative vs. instructive feedback is as follows:
+
+\begin{itemize}
+    \item Evaluative feedback depends entirely on the action taken, whereas
+    \item Instructive feedback is \textit{independent} of the action taken (think making an arbitrary chess move, then being told which is actually the \textit{right} one).  In a sense, this is hardly feedback at all...
+\end{itemize}
+
+\section*{\textcolor{CalPolyGreen}{The N-Armed Bandit}}
+
+The motivating example used by Sutton and Barto is the n-armed bandit.  Suppose you are faced with a set of $n$ different actions or choices
+\begin{equation}
+    \{a_1, \dots, a_n\}
+\end{equation}
+
+and when picking an action, you recieve a reward signal chosen from a statiionary probability distribution associated with that action,
+\[
+    \big\{P_{a_1}, \dots, P_{a_n}\big\}.
+\]
+
+\textbf{Goal}: Maximize the reward signal over some discrete time.
+
+An analogy to the n-armed bandit would be the n-armed slot machine, where each lever ahs some stationary probability distribution giving you some reward.  You want to play the game to an extent where you can determine which are the \textit{good} levers (i.e. associated with a probability distribution with a high expected value), and play exlusively with these levers.
+
+As we just mentioned, each lever (or arm/action) has an associated probability distribution, which has it's own expected value and variance.  This motivates a definition.
+
+\begin{definition}
+The \textit{value} of a action $a_k,\;k=1,\dots,n$, is the \textit{expected value} of $P_{a_k}$, denoted $Q^*(a_k)$.  i.e.
+\[
+    Q^*(a_k) := P(a_k)
+\]
+\end{definition}
+
+\end{document}
