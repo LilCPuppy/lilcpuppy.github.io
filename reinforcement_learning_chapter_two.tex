@@ -1,7 +1,7 @@
 \documentclass[11pt]{article}
 
 \usepackage{amssymb, enumitem, xcolor, titlesec, geometry, sectsty, hyperref}
-\usepackage{amsthm}
+\usepackage{amsthm, amsmath}
 \usepackage{tikz}
 \usetikzlibrary{calc}
 \usepackage{eso-pic}
@@ -57,9 +57,9 @@ The most important feature about reinforcement learning from other types of the 
 \section*{\textcolor{CalPolyGreen}{The N-Armed Bandit}}
 
 The motivating example used by Sutton and Barto is the n-armed bandit.  Suppose you are faced with a set of $n$ different actions or choices
-\begin{equation}
+\[
     \{a_1, \dots, a_n\}
-\end{equation}
+\]
 
 and when picking an action, you recieve a reward signal chosen from a statiionary probability distribution associated with that action,
 \[
@@ -78,5 +78,149 @@ The \textit{value} of a action $a_k,\;k=1,\dots,n$, is the \textit{expected valu
     Q^*(a_k) := P(a_k)
 \]
 \end{definition}
+
+Obviously, if we knew the expected values of all the distributions beforehand, there would be no issue, because we would pick the action with the highest value. However, since we don't, we can only attain estimates of the values based on a historical record or picking an action. Hence, we have a tradeoff: do we exploit the levers we know? Or do we explore and improve teh estimate of the levers that we don't? Over a period of time, attaining the maximum reward may require a combination of these.
+
+This motivates the question, how should we estimate $Q^*(a_k)$?  If at time $t$ we have chosen an action $a_k$ a total $m_k$ times, then it's intuitive to estimate $Q^*(a_k)$ as:
+\[
+    Q_t(a_k) = \frac{1}{m_k} \sum_{l=1}^{m_k} r_l
+\]
+
+where we define $Q_0(a_k):=0$ (or some other default value), and $r_l$ is the $l-$th return from action $a_k$.  We note that this estimate has some measure of "goodness" when observing that
+\[
+    \lim_{m_k\to\infty} Q_t(a_k) = Q^*(a_k).
+\]
+
+Clearly, we don't want to play greedily, i.e. always pick an action $a^*$ such that $a^* = \text{arg max}_a\; Q_t(a)$ since we would never explore (beyond some action set we already know).
+
+A way to promote this exploration is to have an $\epsilon$ chance to explore (and pick $a^*$ randomly from the unknown actions), and $a^* = \text{arg max}_a\; Q_t(a)$ the rest of the time.  These methods are called $\epsilon-$greedy methods.  In the asymptotic case, we see that we will ahave to eventually pick every action an infinite number of times, and hence we maintain that under this $\epsilon-$greedy policy,
+\[
+    \lim_{t\to\infty} Q_t = Q^*.
+\]
+
+\section*{\textcolor{CalPolyGreen}{Softmax Action Selection}}
+
+The last segment detailed a method for our agent to choose an \textit{action}.  Another way to pick an action is to assign each choice a probability.  For example, say we pick $a$ with probability
+\[
+    P(a) = \frac{e^{Q_t(a) / \tau}}{\sum_b e^{Q_t(b) / \tau}}
+\]
+
+where $b$ iterates over the possible actions, and $\tau$ corresponds to the \textit{temperature} picked by the user.  High temperatures will correspond to the actions being close to equiprobable, and low temperatures cuase a greater difference in selection probability.  In fact, as $\tau\to0$, the softmax action selection becomes the same as the greedy action selection.
+
+It's unclear whether $\epsilon-$greedy action selection or softmax action selection is more effective.  The $\epsilon$ methods are easier to tune and dynamically change, whereas the softmax selection means picking $\tau$, hence knowing more about the nature of the distributions specific to the actions.
+
+\section*{\textcolor{CalPolyGreen}{Evaluation vs. Instruction}}
+
+The n-armed bandit problem gives us an example of purely evaluative feedback. In reinforcement learning, the "feedback" is independent of the action. So it's not "real" feedback. Supervised learning algorithms try to configure/shape themselves to their environment - but they cannot learn to control or influence their environments.
+
+\subsection*{\textcolor{CalPolyGreen}{Example}}
+
+Let's dig into these differences by emphasizing an example given by Sutton and Barto. Consider the n-armed bandit problem with 2 arms (i.e. $n=10$). Each action has two rewards, success and failure (binary actions). In a supervised learning setting we might infer an action was "correct" if you got success, and if you got failure, you may assume the other action was "success". Then as you play, you can tally how many times an action was inferred to be correct, and you pick the action based on the tallys (more tallys = higher chance of winning).
+
+Suppose the actions we're deterministic (i.e. they're assigned be either completely success or completely failure), then this algorithm would never be wrong. After a single choice, we would know exactly what action we would fix on. But if the actions were stochastic (each action has a probability of success), then this is certainly not the case.
+
+In this case, the supervised learning approach would work only if the probabilities fulfill the assumption that one action is bad (failure) and the other is good (success). Hence, we need one action will probability of success greater than $\frac{1}{2}$, with the other having a probability of success less than $\frac{1}{2}$. Then, the algorithm would fixate on the better choice, and we would win.
+
+But if both were good (probability of success over $\frac{1}{2}$), or both were bad (probability of success less than $\frac{1}{2}$), than the supervised learning methods how no way of determining which choice is better (or worse). In the both bad case, the algorithm would likely pick a failing action, and always assume the other action is better. When it picks the other option (and also gets failure), it would flip back to the first choice. This cycles, and we get an oscillating algorithm that cannot truly find the better choice of the two. In the both good case, we would quickly fixate on a single action (since it usually wins, the other must usually lose, right?), typically, the first action picked.
+
+So what does a reinforcement learning approach look like? Let
+\[
+\pi_t(x) = \text{"The probability of selecting action }x\text{ at time }t\text{."}
+\]
+
+We then define the next timestep as
+\[
+\pi_{t+1}(x) = \pi_t(d_t) + \alpha\Big[1 - \pi_t(d_t)\Big].
+\]
+
+If the action inferred to be correct on play $t$ was $d_t$ , then we update $\pi_t(d_t)$ an $\alpha$ amount from it's current value toward $1$ We then inversely adjust the other probabilities so they sum to one. We call this algorithms the $L_{R-P}$ (linear, reward-penalty) algorithm. If we do nothing on a failure, we call this the $L_{R-I}$ algorithm (linear, reward-inaction).
+
+We note that these essentially take supervised learning methods, and make them stochastic.
+
+\section*{\textcolor{CalPolyGreen}{Incremental Implementation}}
+
+Recall that
+\[
+    Q_t(a_k) = \frac{1}{m_k} \sum_{l=1}^{m_k} r_l
+\]
+and notice that we can compute this incrementally:
+\begin{align*}
+    Q_{k+1} &= \frac{1}{k+1} \sum_{l=1}^{k+1} r_l    \\
+    &= \frac{k}{(k+1)}\frac{1}{k} \sum_{l=1}^{k+1} r_l	\\
+    &= \frac{k}{(k+1)}\frac{1}{k} \sum_{l=1}^k r_l + \frac{r_{k+1}}{k+1} \\
+    &= \frac{k}{k+1} Q_k + \frac{1}{k+1} r_{k+1}    \\
+    &= Q_k + \frac{1}{k+1}\Big(r_{k+1} - Q_k\Big)   \\
+\end{align*}
+
+Hence, in order to compute $Q_{k+1}$, we only need to know $Q_k$ and $k$.  Moreover, we can see how this is adjusting $Q_{k+1}$ with regards to the old estimate; we are moving $Q_k$ a $\frac{1}{k+1}$ amount (the stepsize!) from the old value, $Q_k$, to the latest estimate, $r_{k+1}$.
+
+\subsection*{\textcolor{CalPolyGreen}{Tracking a Non-Stationary Problem}}
+
+Up until now, we have been managing a stationary problem, i.e. \textit{the bandit it not changing}.  However, what if the bandit does decide to change over time?
+
+In this case, we want to weigh the most recent rewards over the old ones.  One of the popular ways to do this is to use a constant stepsize parameter.
+
+\begin{align*}
+    Q_{k+1} &= Q_k + \alpha\Big(r_{k+1} - Q_k \big) \\
+    &= \Bigg(Q_{k-1} + \alpha\big(r_k - Q_{k-1}\big)\Bigg) + \alpha\Big(r_{k+1} - Q_k\big)  \\
+    &= \dots	\\
+    &= \Big(1 - \alpha\Big)^k Q_0 + \sum_{l=1}^{k+1} \alpha\Big(1 - \alpha\Big)^{k-l} r_l
+\end{align*}
+
+By noticing that $(1-\alpha)^k + \sum_l \alpha(1-\alpha)^{k-l} = 1$, we see that this is in fact a convex combination of $Q_0, r_1, \dots, r_{k+1}$.  Moreover, we see that the coefficients of the older observations are following an exponential decay according to the exponent of $(1-\alpha)$.  As a result, this method is called, \textit{exponential, recency weighted average}.
+
+What if we wanted to generalize further?  Let $a_k(a)$ denote the stepsize paramter, then to guarantee that
+\[
+    \lim_{k\to\infty} Q_k(a) = Q^*(a),
+\]
+
+then we need the conditions that $\sum_{k=1}^\infty a_k(a) = \infty$, and, $\sum_{k=1}^\infty \big(\alpha_k(a)\big)^2 < \infty$.  This ensures that the steps are \textit{large} enough to overcome the initial noise/uncertainty of the problem, and that they are \textit{small} enough to assure convergence.
+
+We notice that for the average sampling method, where $a_k = \frac{1}{k}$, these conditions are met (harmonic series diverges, and p-series $(p=2)$ converges)!  But this is \textit{not} the case for $a_k = \alpha$ (a constant).  Hence, our non-stationary method will not converge, which is fine!  It's a non-stationary problem!  The term \textit{convergence} doesn't make sense in this case.
+
+\section*{\textcolor{CalPolyGreen}{Optimistic Initial Values}}
+
+All the methods so far have been dependent on some initial action-value estimates ($Q_0$).  So they will all be biased by initial estimates to some degree.  Note that for sample averaging methods, the bias completely disappears once all the actions have been chosen at least once (so we can essentially ignore it), but this is not the case for the constant $\alpha_k = \alpha$.
+
+We leave the details to the book, but this need not be a bad thing!  The biased initial estimates can be used to promote exploration in our agent.  See the book for more :).
+
+\section*{\textcolor{CalPolyGreen}{Reinforcement Comparison}}
+
+A central, underlying idea in RL algorithms is that actions followed by large positive rewards should be more likely to occur, and actions followed by small rewards (or penalties!) should be less likley to occur.
+
+But how does the learner know what's good?  A reference reward is needed for this, and a natural choice is the average of the previously chosen rewards.  Algorithms using this approach are called \textit{reinforcement comparison methods}, and can be sometimes more effective than action-value methods.
+
+The difference between the two (reinforcement comparison and action-value) is that reinforcement comparison methods don't keep track of the individual action values, instead they keep a holistic, overall reward.  To pick among the actions, they maintain a separate measure for their preference,
+\[
+    p_t(a)  
+\]
+which is used to calculate the probability of picking action $a$.
+
+An example might be to use the softmax relationship:
+\[
+    \Pi_t(a) = \frac{e^{p_t(a)}}{\sum_\alpha e^{p_t(\alpha)}}
+\]
+where $\Pi_t(a)$ denotes the probability of picking action $a$.  We can then possibly increment the $p_t$'s according to
+\[
+    p_{t+1}(a) = p_t(a) + \beta(r_t - r_t^*)
+\]
+where $r_t^*$ is the reference reward (holistic measure), and we also increment $r_{t+1}^* = r_t^* + \alpha(r_t - r_t^*)$.
+
+\section*{\textcolor{CalPolyGreen}{Pursuint Methods}}
+
+We can refer to the last section as using \textit{action preferences} rather than action values.  Pursuint methods will combine both of these approaches, the action preferences are set to $\Pi_t(a)$, and after each play they are updated to amke the greedy action more likely to be selected.  After the $t$-th play, let $a^* = \text{arg max}_a\;Q_{t}(a)$, then the probability of selecting $a_{t+1} = a^*_{t+1}$ is incremented a $\beta$ of a way towards 1,
+\[
+    \Pi_{t+1}(a^*_{t+1}) = \Pi_t(a^*_{t+1}) + \beta\Big(1 - \Pi_t(a^*_{t+1})\Big)
+\]
+while the rest of the probabilities are evenly decremented towards zero.
+
+\section*{\textcolor{CalPolyGreen}{Associative Search}}
+
+Suppose that there are mulptile n-armed bandits, and we encounter each one randomly on every play.  If we have no indication as to which bandit is which, we might be toast unless the true action values among the bandits were very similar and changed slowly with respect to time.  But what is there was an indication?  Suppose each was assigned a different color, then our agent could start to associate rules with each signal,
+\begin{center}
+"if red, do this, if blue, do this, ...
+\end{center}
+
+This is now an associative search, because it involves both trial and error to find the best actions, but also needs to associate the best actions with the individual bandits.  And now we are almost at a full RL problem, with the only ingredients left being to let our actions affect the next situations.
 
 \end{document}

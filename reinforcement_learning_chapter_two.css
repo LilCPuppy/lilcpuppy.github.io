@@ -11,6 +11,7 @@
 .cmmi-8{font-size:72%;font-style: italic;}
 .cmmi-6{font-size:54%;font-style: italic;}
 .cmsy-8{font-size:72%;}
+.cmex-10x-x-109{}
 .cmbx-10x-x-109{ font-weight: bold;}
 .cmbx-10x-x-109{ font-weight: bold;}
 p.noindent { text-indent: 0em }
@@ -129,11 +130,29 @@ figure.figure > p {text-align:center;}
 figcaption.caption {text-indent:-2em; margin-left:3em; margin-right:1em; text-align:center;}
 figcaption.caption span.id{font-weight: bold; white-space: nowrap; }
 dt.enumerate-enumitem{float:left; clear:left; margin-left:1em; margin-right:1em;}
+.equation td{text-align:center; }
+.equation-star td{text-align:center; }
+table.equation-star { width:100%; }
+table.equation { width:100%; }
+div.align {text-align: center;}
+table.multline, table.multline-star {width:100%;}
+td.gather {text-align:center; }
+table.gather {width:100%;}
+div.gather-star {text-align:center;}
 .rotatebox{display: inline-block;}
 .figure img.graphics {margin-left:10%;}
  html { border-left: 250px solid beige; border-right: 250px solid beige; border-top: 50px solid beige; border-bottom: 50px solid beige; } h3, .cmbx-10x-x-109 { margin-left: 20px; } 
 span#textcolor1{color:#154734}
 span#textcolor2{color:#154734}
 span#textcolor3{color:#154734}
+span#textcolor4{color:#154734}
+span#textcolor5{color:#154734}
+span#textcolor6{color:#154734}
+span#textcolor7{color:#154734}
+span#textcolor8{color:#154734}
+span#textcolor9{color:#154734}
+span#textcolor10{color:#154734}
+span#textcolor11{color:#154734}
+span#textcolor12{color:#154734}
 /* end css.sty */
 
